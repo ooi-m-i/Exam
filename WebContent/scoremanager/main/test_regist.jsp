@@ -33,7 +33,7 @@
         </label>
         <label>回数：
           <select name="testNo" class="form-select">
-            <c:forEach begin="1" end="5" var="no">
+            <c:forEach begin="1" end="2" var="no">
               <option value="${no}">${no}</option>
             </c:forEach>
           </select>
