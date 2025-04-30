@@ -9,13 +9,12 @@ import javax.servlet.http.HttpSession;
 
 import bean.ClassNum;
 import bean.School;
-import bean.Student;
 import bean.Subject;
 import bean.Teacher;
 import bean.Test;
 import dao.ClassNumDAO;
-import dao.StudentDAO;
 import dao.SubjectDAO;
+import dao.TestDAO;
 import tool.Action;
 
 public class TestRegistAction extends Action {
@@ -26,21 +25,21 @@ public class TestRegistAction extends Action {
         Teacher teacher = (Teacher) session.getAttribute("user");
         School school = teacher.getSchool();
 
-        // 各マスターデータを取得
+        // マスター取得
         ClassNumDAO classNumDao = new ClassNumDAO();
         SubjectDAO subjectDao = new SubjectDAO();
 
         List<ClassNum> classList = classNumDao.filter(school.getCd());
         List<Subject> subjectList = subjectDao.filter(school.getCd());
 
-        // 入学年度リスト（最新3年）
+        // 入学年度リスト（直近3年）
         int currentYear = java.time.LocalDate.now().getYear();
         List<Integer> entYearList = new ArrayList<>();
         entYearList.add(currentYear);
         entYearList.add(currentYear - 1);
         entYearList.add(currentYear - 2);
 
-        // 入力パラメータ取得
+        // パラメータ取得
         String entYearStr = request.getParameter("entYear");
         String classNum = request.getParameter("classNum");
         String subjectCd = request.getParameter("subjectCd");
@@ -52,35 +51,23 @@ public class TestRegistAction extends Action {
             int entYear = Integer.parseInt(entYearStr);
             int testNo = Integer.parseInt(testNoStr);
 
-            StudentDAO studentDao = new StudentDAO();
-            List<Student> studentList = studentDao.filter(school, entYear, classNum, true);
+            Subject subject = new Subject();
+            subject.setCd(subjectCd);
 
-            testList = new ArrayList<>();
+            TestDAO testDao = new TestDAO();
+            testList = testDao.filter(entYear, classNum, subject, testNo, school);
 
-            for (Student s : studentList) {
-                Test test = new Test();
-                test.setStudent(s);
-                test.setClassNum(s.getClassNum());
-                test.setSchool(school);
-                test.setNo(testNo);
-                test.setPoint(0); // 初期値
-
-                Subject subject = new Subject();
-                subject.setCd(subjectCd);
-                test.setSubject(subject);
-
-                testList.add(test);
-            }
-
+            request.setAttribute("entYear", entYearStr);
+            request.setAttribute("classNum", classNum);
             request.setAttribute("subjectCd", subjectCd);
             request.setAttribute("testNo", testNoStr);
+            request.setAttribute("testList", testList);
         }
 
-        // JSPに渡す
+        // 画面に渡すマスタデータ
         request.setAttribute("entYearList", entYearList);
         request.setAttribute("classList", classList);
         request.setAttribute("subjectList", subjectList);
-        request.setAttribute("testList", testList);
 
         request.getRequestDispatcher("/scoremanager/main/test_regist.jsp").forward(request, response);
     }
