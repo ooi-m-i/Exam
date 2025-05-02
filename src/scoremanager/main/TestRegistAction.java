@@ -45,8 +45,18 @@ public class TestRegistAction extends Action {
         String subjectCd = request.getParameter("subjectCd");
         String testNoStr = request.getParameter("testNo");
 
-        List<Test> testList = null;
+        // 画面に渡すマスタデータ
+        request.setAttribute("entYearList", entYearList);
+        request.setAttribute("classList", classList);
+        request.setAttribute("subjectList", subjectList);
 
+        // errorMapがすでにある場合（バリデーションエラーなど）、再処理しない
+        if (request.getAttribute("errorMap") != null) {
+            request.getRequestDispatcher("/scoremanager/main/test_regist.jsp").forward(request, response);
+            return;
+        }
+
+        List<Test> testList = null;
         if (entYearStr != null && classNum != null && subjectCd != null && testNoStr != null) {
             int entYear = Integer.parseInt(entYearStr);
             int testNo = Integer.parseInt(testNoStr);
@@ -63,11 +73,6 @@ public class TestRegistAction extends Action {
             request.setAttribute("testNo", testNoStr);
             request.setAttribute("testList", testList);
         }
-
-        // 画面に渡すマスタデータ
-        request.setAttribute("entYearList", entYearList);
-        request.setAttribute("classList", classList);
-        request.setAttribute("subjectList", subjectList);
 
         request.getRequestDispatcher("/scoremanager/main/test_regist.jsp").forward(request, response);
     }
