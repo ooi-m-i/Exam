@@ -85,8 +85,7 @@ public class TestDAO extends DAO {
             "                AND t.subject_cd = ? " +
             "                AND t.no = ? " +
             "                AND t.school_cd = ? " +
-            "WHERE s.ent_year = ? AND s.class_num = ? AND s.school_cd = ? " +
-            "ORDER BY s.no";
+            "WHERE s.ent_year = ? AND s.class_num = ? AND s.school_cd = ? AND s.is_attend = true ORDER BY s.no";
 
         PreparedStatement st = connection.prepareStatement(sql);
         st.setString(1, subject.getCd());
