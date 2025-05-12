@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import bean.ClassNum;
 import bean.School;
 import bean.Subject;
 import bean.Teacher;
@@ -29,8 +28,8 @@ public class TestRegistAction extends Action {
         ClassNumDAO classNumDao = new ClassNumDAO();
         SubjectDAO subjectDao = new SubjectDAO();
 
-        List<ClassNum> classList = classNumDao.filter(school.getCd());
-        List<Subject> subjectList = subjectDao.filter(school.getCd());
+        List<String> classList = classNumDao.filter(teacher.getSchool());
+        List<Subject> subjectList = subjectDao.filter(teacher.getSchool());
 
         // 入学年度リスト（直近3年）
         int currentYear = java.time.LocalDate.now().getYear();

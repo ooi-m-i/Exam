@@ -50,9 +50,9 @@
             <label class="form-label">クラス</label>
             <select name="classNum" class="form-select">
               <option value="0">--------</option>
-              <c:forEach var="c" items="${classList}">
-                <option value="${c.class_num}" <c:if test="${c.class_num == classNum}">selected</c:if>>${c.class_num}</option>
-              </c:forEach>
+			        <c:forEach var="num" items="${classList}">
+			          <option value="${num}" <c:if test="${num==classNum}">selected</c:if>>${num}</option>
+			        </c:forEach>
             </select>
           </div>
           <div class="col-3">
