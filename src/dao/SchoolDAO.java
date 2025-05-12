@@ -10,6 +10,7 @@ import bean.School;
 
 public class SchoolDAO extends DAO {
 
+	//	学校コードからschoolテーブルのデータを取得する
 	public School get(String cd) throws Exception {
 		School school = new School();
 		Connection connection = getConnection();

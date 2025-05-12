@@ -13,6 +13,7 @@ import bean.School;
 
 public class ClassNumDAO extends DAO {
 
+	//	クラスと学校コードからクラステーブルのデータを取得する
 	public ClassNum get(String class_num, School school) throws Exception {
 		ClassNum classNum = new ClassNum();
 		Connection connection = getConnection();
@@ -58,6 +59,7 @@ public class ClassNumDAO extends DAO {
 	}
 
 
+	//	学校コードからクラスのリストを取得する
 	public List<String> filter(School school) throws Exception {
 		List<String> list = new ArrayList<>();
 		Connection connection = getConnection();

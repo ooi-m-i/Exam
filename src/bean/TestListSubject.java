@@ -2,7 +2,7 @@ package bean;
 
 import java.util.Map;
 
-public class TestListSubject {
+public class TestListSubject implements java.io.Serializable {
 
 //	フィールドの定義
 	private int entYear;
@@ -50,6 +50,14 @@ public class TestListSubject {
 
 	public void setPoints(Map<Integer, Integer> points) {
 		this.points = points;
+	}
+
+	public int getPoint(int key) {
+		return points.get(key);
+	}
+
+	public void putPoint(int key, int value) {
+		points.put(key, value);
 	}
 
 }

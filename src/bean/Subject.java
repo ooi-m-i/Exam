@@ -1,6 +1,6 @@
 package bean;
 
-public class Subject {
+public class Subject implements java.io.Serializable {
 
 //	フィールドの定義
 	private String cd;

@@ -19,10 +19,11 @@ public class StudentCreateAction extends Action {
 			HttpServletRequest request, HttpServletResponse response
 	) throws Exception {
 
+		//	セッションの保持
 		HttpSession session = request.getSession();
 		Teacher teacher = (Teacher)session.getAttribute("user");
 
-
+		//	フィールドの宣言
 		LocalDate todaysDate = LocalDate.now();
 		int year = todaysDate.getYear();
 		ClassNumDAO cNumDao = new ClassNumDAO();
@@ -34,7 +35,7 @@ public class StudentCreateAction extends Action {
 			entYearSet.add(i);
 		}
 
-
+		//	クラスをリストに格納
 		List<String> list = cNumDao.filter(teacher.getSchool());
 
 

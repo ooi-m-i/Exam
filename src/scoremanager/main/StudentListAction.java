@@ -23,10 +23,11 @@ public class StudentListAction extends Action {
 			HttpServletRequest request, HttpServletResponse response
 	) throws Exception {
 
+		//	セッションの保持
 		HttpSession session = request.getSession();
 		Teacher teacher = (Teacher)session.getAttribute("user");
 
-
+		//	フィールドの宣言
 		String entYearStr="";
 		String classNum="";
 		String isAttendStr="";
@@ -39,6 +40,7 @@ public class StudentListAction extends Action {
 		ClassNumDAO cNumDAO = new ClassNumDAO();
 		Map<String, String> errors = new HashMap<>();
 
+		//	JSPからデータを受け取る
 		entYearStr = request.getParameter("f1");
 		classNum = request.getParameter("f2");
 		isAttendStr = request.getParameter("f3");
@@ -62,6 +64,7 @@ public class StudentListAction extends Action {
 			request.setAttribute("f3", isAttendStr);
 		}
 
+		//	入力された値によって分岐
 		if (entYear != 0 && !classNum.equals("0")) {
 			students = sDAO.filter(teacher.getSchool(), entYear, classNum, isAttend);
 		} else if (entYear != 0 && classNum.equals("0")) {
@@ -77,8 +80,6 @@ public class StudentListAction extends Action {
 
 		request.setAttribute("f1", entYear);
 		request.setAttribute("f2", classNum);
-
-
 
 		request.setAttribute("students", students);
 		request.setAttribute("class_num_set", list);

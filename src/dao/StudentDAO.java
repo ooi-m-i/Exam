@@ -15,7 +15,7 @@ public class StudentDAO extends DAO {
 
 	private String baseSql = "select * from student where school_cd=? ";
 
-
+	//	学生番号から学生情報を取得する
 	public Student get(String no) throws Exception {
 		Student student = new Student();
 		Connection connection = getConnection();
@@ -63,6 +63,8 @@ public class StudentDAO extends DAO {
 		return student;
 	}
 
+
+	//	フィルター後、リストへの格納処理をする
 	public List<Student> postFilter(ResultSet rSet, School school) throws Exception {
 		List<Student> list = new ArrayList<>();
 		try {
@@ -86,6 +88,7 @@ public class StudentDAO extends DAO {
 	}
 
 
+	//	引数の情報から該当する学生情報を取得する
 	public List<Student> filter(School school, int entYear, String classNum, boolean isAttend) throws Exception {
 		List<Student> list = new ArrayList<>();
 		Connection connection = getConnection();
@@ -134,6 +137,7 @@ public class StudentDAO extends DAO {
 	}
 
 
+	//	引数の情報から該当する学生情報を取得する
 	public List<Student> filter(School school, int entYear, boolean isAttend) throws Exception {
 		List<Student> list = new ArrayList<>();
 		Connection connection = getConnection();
@@ -180,6 +184,7 @@ public class StudentDAO extends DAO {
 	}
 
 
+	//	引数の情報から該当する学生情報を取得する
 	public List<Student> filter(School school, boolean isAttend) throws Exception {
 		List<Student> list = new ArrayList<>();
 		Connection connection = getConnection();
@@ -225,6 +230,7 @@ public class StudentDAO extends DAO {
 	}
 
 
+	//	学生情報の登録・更新を行う
 	public boolean save(Student student) throws Exception {
 
 		Connection connection = getConnection();
@@ -233,6 +239,7 @@ public class StudentDAO extends DAO {
 
 		try {
 			Student old = get(student.getNo());
+			Boolean isAttend = true;
 
 			if (old == null) {
 			statement = connection.prepareStatement(
@@ -242,7 +249,7 @@ public class StudentDAO extends DAO {
 			statement.setString(2, student.getName());
 			statement.setInt(3, student.getEntYear());
 			statement.setString(4, student.getClassNum());
-			statement.setBoolean(5, student.isAttend());
+			statement.setBoolean(5, isAttend);
 			statement.setString(6, student.getSchool().getCd());
 
 			} else {
@@ -284,47 +291,5 @@ public class StudentDAO extends DAO {
 		} else
 			return false;
 		}
-
-
-		public boolean delete(Student student) throws Exception {
-			Connection connection = getConnection();
-			PreparedStatement statement = null;
-			int count = 0;
-
-			try {
-				statement = connection.prepareStatement("delete from student where no=?");
-
-				statement.setString(1, student.getNo());
-
-				count = statement.executeUpdate();
-
-			} catch (Exception e) {
-				throw e;
-			} finally {
-				if (statement != null) {
-					try {
-						statement.close();
-					} catch (SQLException sqle) {
-						throw sqle;
-					}
-				}
-
-				if (connection != null) {
-					try {
-						connection.close();
-					} catch (SQLException sqle) {
-						throw sqle;
-					}
-				}
-			}
-
-			if (count > 0) {
-				return true;
-			} else {
-				return false;
-			}
-
-	}
-
 
 }
