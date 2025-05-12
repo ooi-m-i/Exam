@@ -23,10 +23,11 @@ public class StudentCreateExecuteAction extends Action {
 			HttpServletRequest request, HttpServletResponse response
 	) throws Exception {
 
+		//	セッションの保持
 		HttpSession session = request.getSession();
 		Teacher teacher = (Teacher)session.getAttribute("user");
 
-
+		//	フィールドの宣言
 		String entYearStr="";
 		String no = "";
 		String name = "";
@@ -56,8 +57,10 @@ public class StudentCreateExecuteAction extends Action {
 			entYearSet.add(i);
 		}
 
+		//	クラスをリストに格納
 		List<String> list = cNumDao.filter(teacher.getSchool());
 
+		//	エラー分岐
 		if (entYear==0 && sDao.get(no) != null) {
 		    errors.put("e1", "入学年度を選択してください");
 		    errors.put("e2", "学生番号が重複しています");
@@ -75,7 +78,7 @@ public class StudentCreateExecuteAction extends Action {
 		request.setAttribute("ent_year_set", entYearSet);
 		request.setAttribute("class_num_set", list);
 
-	    // エラーがあれば戻す
+	    // エラーがあれば登録ページに戻す
 	    if (!errors.isEmpty()) {
 	        request.getRequestDispatcher("student_create.jsp").forward(request, response);
 	        return;
@@ -88,7 +91,7 @@ public class StudentCreateExecuteAction extends Action {
 		students.setClassNum(classNum);
 		students.setSchool(teacher.getSchool());
 
-
+		//	登録ができたら完了ページに遷移する
 		boolean line = sDao.save(students);
 		if (line==true) {
 			request.getRequestDispatcher("student_create_done.jsp").forward(request, response);

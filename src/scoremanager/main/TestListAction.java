@@ -8,12 +8,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import bean.Subject;
 import bean.Teacher;
 import dao.ClassNumDAO;
+import dao.SubjectDAO;
 import tool.Action;
 
 
-public class StudentCreateAction extends Action {
+public class TestListAction extends Action {
 
 	public void execute(
 			HttpServletRequest request, HttpServletResponse response
@@ -26,7 +28,8 @@ public class StudentCreateAction extends Action {
 		//	フィールドの宣言
 		LocalDate todaysDate = LocalDate.now();
 		int year = todaysDate.getYear();
-		ClassNumDAO cNumDao = new ClassNumDAO();
+		ClassNumDAO cNumDAO = new ClassNumDAO();
+		SubjectDAO subDAO = new SubjectDAO();
 
 
 		List<Integer> entYearSet = new ArrayList<>();
@@ -35,13 +38,16 @@ public class StudentCreateAction extends Action {
 			entYearSet.add(i);
 		}
 
-		//	クラスをリストに格納
-		List<String> list = cNumDao.filter(teacher.getSchool());
+		//	クラス・科目をリストに格納
+		List<String> list = cNumDAO.filter(teacher.getSchool());
+		List<Subject> subjectList = subDAO.filter(teacher.getSchool());
 
 
-		request.setAttribute("class_num_set", list);
 		request.setAttribute("ent_year_set", entYearSet);
+		request.setAttribute("class_num_set", list);
+		request.setAttribute("subjects", subjectList);
 
-		request.getRequestDispatcher("student_create.jsp").forward(request, response);
+
+		request.getRequestDispatcher("test_list.jsp").forward(request, response);
 	}
 }
