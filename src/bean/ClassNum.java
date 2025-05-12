@@ -20,5 +20,4 @@ public class ClassNum implements java.io.Serializable {
 		this.school = school;
 	}
 
-
 }

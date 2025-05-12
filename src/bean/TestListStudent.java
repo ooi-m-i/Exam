@@ -1,6 +1,6 @@
 package bean;
 
-public class TestListStudent {
+public class TestListStudent implements java.io.Serializable {
 
 //	フィールドの定義
 	private String subjectName;
