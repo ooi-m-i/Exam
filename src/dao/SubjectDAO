@@ -1,0 +1,235 @@
+package ;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import bean.School;
+import bean.Subject;
+
+//データーベースの連携処理
+public class SubjectDAO extends DAO {
+
+   //chool_cd（学校コード）で科目をフィルタリングするための基本SQL
+    private String baseSql = "select * from subject where school_cd=? ";
+
+    // 科目を1件取得
+    public Subject get(String cd) throws Exception {
+        Subject subject = new Subject();
+        Connection connection = getConnection();
+        PreparedStatement statement = null;
+
+        try {
+        	//subject_codeで科目を検索します
+        	//SQL文のパラメータ（?）に、メソッド引数cd（科目コード）をセットします。
+            statement = connection.prepareStatement("select * from subjects where subject_code=?");
+
+            statement.setString(1, cd);
+            //statement.executeQuery(): SQL文を実行し、結果をResultSetとして取得します。
+            ResultSet rSet = statement.executeQuery();
+            //SchoolDAOオブジェクトを生成します。科目が所属する学校の情報を取得するために使用します
+            SchoolDAO schoolDAO = new SchoolDAO();
+
+            if (rSet.next()) {
+            	//取得した科目コードをSubjectオブジェクトにセット
+                subject.setCd(rSet.getString("subject_code"));
+                // 取得した科目名をSubjectオブジェクトにセット
+                subject.setName(rSet.getString("subject_name"));
+                //学校コードを基にSchoolDAOから学校情報を取得し、Subjectオブジェクトにセット
+                subject.setSchool(schoolDAO.get(rSet.getString("school_cd")));
+            } else {
+                subject = null;
+            }
+            //エラーが発生した場合、Exceptionを捕捉して再ロードします。
+        } catch (Exception e) {
+            throw e;
+            //finally: リソース（PreparedStatementやConnection）を確実にクローズします。エラーが発生しても、
+            //リソースの解放は行います
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException sqle) {
+                    throw sqle;
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException sqle) {
+                    throw sqle;
+                }
+            }
+        }
+        //最終的に取得したSubjectオブジェクトを返します
+        return subject;
+    }
+
+    // ResultSetを元にSubjectのリストを生成
+    public List<Subject> postFilter(ResultSet rSet, School school) throws Exception {
+        List<Subject> list = new ArrayList<>();
+        try {
+            while (rSet.next()) {
+                Subject subject = new Subject();
+
+                subject.setCd(rSet.getString("subject_code"));
+                subject.setName(rSet.getString("subject_name"));
+                subject.setSchool(school);
+
+                list.add(subject);
+            }
+        } catch (SQLException | NullPointerException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    //postFilter メソッド（ResultSetを基にリストを作成）
+    public List<Subject> filter(School school, String subjectCode, boolean isActive) throws Exception {
+    	//List<Subject> list = new ArrayList<>(); Subjectのリストを作成します
+        List<Subject> list = new ArrayList<>();
+        Connection connection = getConnection();
+        PreparedStatement statement = null;
+        //後でSQLクエリの結果を格納するために使用されます。
+        ResultSet rSet = null;
+        //これは、SQLクエリの条件部分（WHERE句の一部）を定義しています。
+        String condition = "and subject_code=? ";
+        //is_activeの状態がtrueである場合に、クエリに追加される条件を保持するために使用
+        String conditionIsActive = "";
+        //（科目コード）を昇順（asc）でソートするように指定
+        String order = " order by subject_code asc";
+
+        if (isActive) {
+        	//subject_code（科目コード）を条件として検索する準備をします
+            conditionIsActive = "and is_active=true";
+        }
+
+        try {
+        	//PreparedStatement SQL文をデータベースに送信
+            //condition: subject_code=?という部分（科目コードを条件にする）
+            statement = connection.prepareStatement(baseSql + condition + conditionIsActive + order);
+
+            statement.setString(1, school.getCd());
+            statement.setString(2, subjectCode);
+            //executeQuery()でデータベースからデータを取得
+            rSet = statement.executeQuery();
+            list = postFilter(rSet, school);
+
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException sqle) {
+                    throw sqle;
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException sqle) {
+                    throw sqle;
+                }
+            }
+        }
+
+        return list;
+    }
+
+    //データーの追加と更新
+    public boolean save(Subject subject) throws Exception {
+        Connection connection = getConnection();
+        PreparedStatement statement = null;
+        int count = 0;
+
+        try {
+            Subject old = get(subject.getCd());
+
+            if (old == null) {
+                statement = connection.prepareStatement(
+                		//INSERT 文を使ってデータベースに追加
+                        "insert into subjects (subject_code, subject_name, school_cd, is_active) values(?, ?, ?, ?)");
+
+                statement.setString(1, subject.getCd());
+                statement.setString(2, subject.getName());
+                statement.setString(3, subject.getSchool().getCd());
+                statement.setBoolean(4, true); // 新しい科目はアクティブに設定
+            } else {
+                statement = connection.prepareStatement(
+                		//既存の科目であれば UPDATE 文を使って情報を更新
+                        "update subjects set subject_name=?, school_cd=?, is_active=? where subject_code=?");
+
+                statement.setString(1, subject.getName());
+                statement.setString(2, subject.getSchool().getCd());
+                statement.setBoolean(3, true);
+                statement.setString(4, subject.getCd());
+            }
+
+            count = statement.executeUpdate();
+
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException sqle) {
+                    throw sqle;
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException sqle) {
+                    throw sqle;
+                }
+            }
+        }
+
+        return count > 0;
+    }
+
+    // 削除処理
+    public boolean delete(Subject subject) throws Exception {
+        Connection connection = getConnection();
+        PreparedStatement statement = null;
+        int count = 0;
+
+        try {
+            statement = connection.prepareStatement("delete from subjects where subject_code=?");
+
+            statement.setString(1, subject.getCd());
+
+            count = statement.executeUpdate();
+
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException sqle) {
+                    throw sqle;
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException sqle) {
+                    throw sqle;
+                }
+            }
+        }
+        //// 削除が成功した場合trueを返す
+        return count > 0;
+    }
+}
