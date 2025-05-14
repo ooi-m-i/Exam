@@ -185,7 +185,7 @@ public class TestDAO extends DAO {
         	st.setInt(3, test.getNo());
         	st.setString(4, test.getSchool().getCd());
         	st.setInt(5, test.getPoint());
-        	st.setString(6, test.getClassNum()); // ← これでOK
+        	st.setString(6, test.getClassNum());
 
             int inserted = st.executeUpdate();
             st.close();
