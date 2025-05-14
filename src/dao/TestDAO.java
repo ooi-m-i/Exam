@@ -166,24 +166,27 @@ public class TestDAO extends DAO {
         check.close();
 
         if (exists) {
-            String sqlUpdate = "UPDATE test SET point = ? WHERE student_no = ? AND subject_cd = ? AND no = ? AND school_cd = ?";
-            PreparedStatement st = connection.prepareStatement(sqlUpdate);
-            st.setInt(1, test.getPoint());
-            st.setString(2, test.getStudent().getNo());
-            st.setString(3, test.getSubject().getCd());
-            st.setInt(4, test.getNo());
-            st.setString(5, test.getSchool().getCd());
+        	String sqlUpdate = "UPDATE test SET point = ?, class_num = ? WHERE student_no = ? AND subject_cd = ? AND no = ? AND school_cd = ?";
+        	PreparedStatement st = connection.prepareStatement(sqlUpdate);
+        	st.setInt(1, test.getPoint());
+        	st.setString(2, test.getClassNum());
+        	st.setString(3, test.getStudent().getNo());
+        	st.setString(4, test.getSubject().getCd());
+        	st.setInt(5, test.getNo());
+        	st.setString(6, test.getSchool().getCd());
             int updated = st.executeUpdate();
             st.close();
             return updated > 0;
         } else {
-            String sqlInsert = "INSERT INTO test (student_no, subject_cd, no, school_cd, point) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement st = connection.prepareStatement(sqlInsert);
-            st.setString(1, test.getStudent().getNo());
-            st.setString(2, test.getSubject().getCd());
-            st.setInt(3, test.getNo());
-            st.setString(4, test.getSchool().getCd());
-            st.setInt(5, test.getPoint());
+        	String sqlInsert = "INSERT INTO test (student_no, subject_cd, no, school_cd, point, class_num) VALUES (?, ?, ?, ?, ?, ?)";
+        	PreparedStatement st = connection.prepareStatement(sqlInsert);
+        	st.setString(1, test.getStudent().getNo());
+        	st.setString(2, test.getSubject().getCd());
+        	st.setInt(3, test.getNo());
+        	st.setString(4, test.getSchool().getCd());
+        	st.setInt(5, test.getPoint());
+        	st.setString(6, test.getClassNum()); // ← これでOK
+
             int inserted = st.executeUpdate();
             st.close();
             return inserted > 0;
