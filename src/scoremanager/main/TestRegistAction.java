@@ -24,54 +24,84 @@ public class TestRegistAction extends Action {
         Teacher teacher = (Teacher) session.getAttribute("user");
         School school = teacher.getSchool();
 
-        // マスター取得
+        // ▼ マスター取得
         ClassNumDAO classNumDao = new ClassNumDAO();
         SubjectDAO subjectDao = new SubjectDAO();
 
-        List<String> classList = classNumDao.filter(teacher.getSchool());
-        List<Subject> subjectList = subjectDao.filter(teacher.getSchool());
+        List<String> classList = classNumDao.filter(school);
+        List<Subject> subjectList = subjectDao.filter(school);
 
-        // 入学年度リスト（直近3年）
+        // ▼ 入学年度リスト（直近3年）
         int currentYear = java.time.LocalDate.now().getYear();
         List<Integer> entYearList = new ArrayList<>();
         entYearList.add(currentYear);
         entYearList.add(currentYear - 1);
         entYearList.add(currentYear - 2);
 
-        // パラメータ取得
+        // ▼ パラメータ取得
         String entYearStr = request.getParameter("entYear");
         String classNum = request.getParameter("classNum");
         String subjectCd = request.getParameter("subjectCd");
         String testNoStr = request.getParameter("testNo");
 
-        // 画面に渡すマスタデータ
+        // ▼ 検索ボタンが押されたかどうか（URLに何らかのクエリが含まれているか）
+        boolean isSearchTriggered = entYearStr != null || classNum != null || subjectCd != null || testNoStr != null;
+        request.setAttribute("isSearchTriggered", isSearchTriggered);
+
+        // ▼ 必ず渡すマスタデータ
         request.setAttribute("entYearList", entYearList);
         request.setAttribute("classList", classList);
         request.setAttribute("subjectList", subjectList);
 
-        // errorMapがすでにある場合（バリデーションエラーなど）、再処理しない
+        // ▼ エラー時に再表示する
         if (request.getAttribute("errorMap") != null) {
             request.getRequestDispatcher("/scoremanager/main/test_regist.jsp").forward(request, response);
             return;
         }
 
-        List<Test> testList = null;
-        if (entYearStr != null && classNum != null && subjectCd != null && testNoStr != null) {
-            int entYear = Integer.parseInt(entYearStr);
-            int testNo = Integer.parseInt(testNoStr);
+        // ▼ 不完全チェック（いずれか未選択 または "0"）
+        boolean isIncomplete =
+            entYearStr == null || entYearStr.equals("0") ||
+            classNum == null || classNum.equals("0") ||
+            subjectCd == null || subjectCd.equals("0") ||
+            testNoStr == null || testNoStr.equals("0");
 
-            Subject subject = new Subject();
-            subject.setCd(subjectCd);
+        if (isIncomplete && isSearchTriggered) {
+            request.setAttribute("errorMsg", "入学年度とクラスと科目と回数を選択してください");
 
-            TestDAO testDao = new TestDAO();
-            testList = testDao.filter(entYear, classNum, subject, testNo, school);
-
+            // 選択状態の保持
             request.setAttribute("entYear", entYearStr);
             request.setAttribute("classNum", classNum);
             request.setAttribute("subjectCd", subjectCd);
             request.setAttribute("testNo", testNoStr);
-            request.setAttribute("testList", testList);
+
+            request.getRequestDispatcher("/scoremanager/main/test_regist.jsp").forward(request, response);
+            return;
         }
+
+        // ▼ パース前に再チェック（安全対策）
+        if (entYearStr == null || testNoStr == null) {
+            request.setAttribute("errorMsg", "不正なアクセスです（再度条件を選択してください）");
+            request.getRequestDispatcher("/scoremanager/main/test_regist.jsp").forward(request, response);
+            return;
+        }
+
+        // ▼ parseInt 安心して実行できる
+        int entYear = Integer.parseInt(entYearStr);
+        int testNo = Integer.parseInt(testNoStr);
+
+        Subject subject = new Subject();
+        subject.setCd(subjectCd);
+
+        TestDAO testDao = new TestDAO();
+        List<Test> testList = testDao.filter(entYear, classNum, subject, testNo, school);
+
+        // ▼ 選択状態と結果をセット
+        request.setAttribute("entYear", entYearStr);
+        request.setAttribute("classNum", classNum);
+        request.setAttribute("subjectCd", subjectCd);
+        request.setAttribute("testNo", testNoStr);
+        request.setAttribute("testList", testList);
 
         request.getRequestDispatcher("/scoremanager/main/test_regist.jsp").forward(request, response);
     }
