@@ -26,7 +26,7 @@ public class FrontController extends HttpServlet {
 
 			System.out.println("★ servlet path ->" + request.getServletPath());
 			System.out.println("★ class name ->" + name);
-			
+
 			//アクションのクラスに関連付けられた、
 			//パスに該当するクラスのコンストラクタを呼び出し、インスタンス化
 			Action action = (Action)Class.forName(name).
