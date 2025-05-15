@@ -50,7 +50,7 @@
                         <button type="submit" class="btn btn-primary">登録</button>
                     </div>
                     <!-- 戻るリンク -->
-                    <a href="javascript:history.back()">戻る</a>
+                    <a href="SubjectList.action">戻る</a>
                 </div>
             </form>
         </section>
