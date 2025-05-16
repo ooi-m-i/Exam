@@ -1,7 +1,7 @@
 package scoremanager;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,6 +22,7 @@ public class LoginExecuteAction extends Action {
 		String password = "";
 		TeacherDAO teacherDao = new TeacherDAO();
 		Teacher teacher = null;
+		Map<String, String> errors = new HashMap<>();
 
 		//リクエストパラメータ―の取得 2
 		id = request.getParameter("id");// 教員ID
@@ -48,9 +49,8 @@ public class LoginExecuteAction extends Action {
 		} else {
 			// 認証失敗の場合
 			// エラーメッセージをセット
-			List<String> errors = new ArrayList<>();
-			errors.add("ログインに失敗しました。IDまたはパスワードが正しくありません。");
-			request.setAttribute("e", errors);
+			errors.put("e", "ログインに失敗しました。IDまたはパスワードが正しくありません。");
+			request.setAttribute("errors", errors);
 			// 入力された教員IDをセット
 			request.setAttribute("id", id);
 

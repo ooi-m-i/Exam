@@ -21,7 +21,7 @@
 		<form class="mx-auto py-3" style="width: 50%" action="LoginExecute.action" method="post">
 		  <div class="form-floating mb-3">
 		    <label for="ID" class="form-label text-secondary text-opacity-10" style="top: -0.6rem; font-size: 0.9rem;">ID</label>
-		    <input type="text" class="form-control" id="ID" name="id" required>
+		    <input type="text" class="form-control" value="${id}" name="id" required>
 		  </div>
 		  <div class="form-floating mb-3">
 		    <label for="password" class="form-label text-secondary text-opacity-10" style="top: -0.6rem; font-size: 0.9rem;">パスワード</label>
