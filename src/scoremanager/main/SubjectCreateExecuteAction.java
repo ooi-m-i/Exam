@@ -1,9 +1,6 @@
 package scoremanager.main;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -24,10 +21,6 @@ public class SubjectCreateExecuteAction extends Action {
         // ログインチェック
         HttpSession session = request.getSession();
         Teacher teacher = (Teacher) session.getAttribute("user");
-        if (teacher == null) {
-            response.sendRedirect(request.getContextPath() + "/scoremanager/Login.action");
-            return;
-        }
 
         // パラメータ取得
         String cd = request.getParameter("cd");
@@ -64,24 +57,19 @@ public class SubjectCreateExecuteAction extends Action {
                 return;
             }
 
-            // 登録処理（DBへ接続）
-            Class.forName("org.h2.Driver");
-            String url    = "jdbc:h2:tcp://localhost/~/school";
-            String dbUser = "sa", dbPass = "";
+            // 新しいSubjectインスタンスを作成
+            Subject subject = new Subject();
+            subject.setCd(cd);
+            subject.setName(name);
+            subject.setSchool(teacher.getSchool());
 
-            try (Connection conn = DriverManager.getConnection(url, dbUser, dbPass);
-                 PreparedStatement ps = conn.prepareStatement(
-                         "INSERT INTO subject (cd, name, school_cd) VALUES (?, ?, ?)")) {
-                ps.setString(1, cd);
-                ps.setString(2, name);
-                ps.setString(3, teacher.getSchool().getCd());
-                ps.executeUpdate();
+            // 登録処理
+            boolean line = subjectDAO.save(subject);
+            if (line == true) {
+                request.getRequestDispatcher("/scoremanager/main/subject_create_done.jsp")
+                       .forward(request, response);
+                return;
             }
-
-            // 登録完了 → 完了画面へリダイレクト
-            request.getRequestDispatcher("/scoremanager/main/subject_create_done.jsp")
-                   .forward(request, response);
-            return;
 
 
         } catch (Exception e) {
