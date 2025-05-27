@@ -53,6 +53,11 @@ ${param.scripts}
 						<section>
 							<p>開発中です・・・</p>
 							<img alt="開発中の画像" src="image/error.jpg" width="300">
+
+							<div style="margin-top: 2rem;">
+								<a href="javascript:history.back()" class="me-5">戻る</a>
+							</div>
+
 						</section>
 					</main>
 				</c:when>
