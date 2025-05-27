@@ -52,6 +52,10 @@ ${param.scripts}
 					<main class="col-9 border-start">
 						<section>
 							<p>エラーが発生しました</p>
+
+							<div style="margin-top: 10rem;">
+								<a href="javascript:history.back()" class="me-5">戻る</a>
+							</div>
 						</section>
 					</main>
 				</c:when>
