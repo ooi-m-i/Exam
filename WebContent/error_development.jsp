@@ -51,7 +51,8 @@ ${param.scripts}
 					</nav>
 					<main class="col-9 border-start">
 						<section>
-							<p>エラーが発生しました</p>
+							<p>開発中です・・・</p>
+							<img alt="開発中の画像" src="image/error.jpg" width="300">
 						</section>
 					</main>
 				</c:when>
